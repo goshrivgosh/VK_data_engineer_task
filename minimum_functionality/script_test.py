@@ -3,8 +3,8 @@ import unittest
 import shutil
 import pandas as pd
 import numpy as np
-from script import aggregate_files
 from generate import generate_csv
+from script import aggregate_files
 
 
 class TestSomeModel(unittest.TestCase):
@@ -72,9 +72,8 @@ class TestSomeModel(unittest.TestCase):
         aggregate_files(actual_date, 'input_test', 'output_test')
         aggregate_logs = pd.read_csv(f"output_test/{actual_date}.csv").drop("email", axis=1)
 
-        print(type(aggregate_logs.values))
-        self.assertEqual((np.array([[3, 0, 1, 0],
-                                    [1, 1, 1, 1]]) - aggregate_logs.values).sum(), 0)
+        self.assertEqual(np.abs((np.array([[3, 0, 1, 0],
+                                           [1, 1, 1, 1]]) - aggregate_logs.values)).sum(), 0)
 
         self.assertEqual(8, aggregate_logs.sum().sum())
         shutil.rmtree('input_test')
@@ -95,9 +94,8 @@ class TestSomeModel(unittest.TestCase):
         aggregate_files(actual_date, 'input_test', 'output_test')
         aggregate_logs = pd.read_csv(f"output_test/{actual_date}.csv").drop("email", axis=1)
 
-        print(type(aggregate_logs.values))
-        self.assertEqual((np.array([[2, 1, 1, 0],
-                                    [3, 0, 0, 1]]) - aggregate_logs.values).sum(), 0)
+        self.assertEqual(np.abs(np.array([[2, 1, 1, 0],
+                                          [3, 0, 0, 1]]) - aggregate_logs.values).sum(), 0)
 
         self.assertEqual(8, aggregate_logs.sum().sum())
         shutil.rmtree('input_test')

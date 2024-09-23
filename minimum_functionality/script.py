@@ -1,10 +1,12 @@
 import os
 import sys
 import datetime
+
 import pandas as pd
 
 
-def aggregate_files(actual_date, input_directory: str = "../input", output_directory: str = "../output"):
+def aggregate_files(actual_date=datetime.datetime.now(), input_directory: str = "input",
+                    output_directory: str = "output"):
     """
     :param actual_date: дата, по которой отсчитываются 7 предыдущих дней
     :param input_directory: директория с файлами логов по датам
@@ -35,8 +37,21 @@ def aggregate_files(actual_date, input_directory: str = "../input", output_direc
                           .count()
                           .unstack(fill_value=0)
                           .reset_index())
+
+        """
+        иногда нужных колонок может не быть в итоговой агрегации - 
+        все равно добавим эти колонки и заполним их нулями
+        для стандартизации
+        """
+        new_cols = list({"CREATE", "READ", "UPDATE", "DELETE"} -
+                        set(aggregate_logs.columns).intersection())
+        size_aggregate = len(aggregate_logs)
+        if len(new_cols) != 0:
+            for cols in new_cols:
+                aggregate_logs[cols] = [0] * size_aggregate
         aggregate_logs = aggregate_logs[["email", "CREATE", "READ", "UPDATE", "DELETE"]]
-        aggregate_logs.columns = ["email", "create_count", "read_count", "update_count", "delete_count"]
+        aggregate_logs.columns = ["email", "create_count", "read_count",
+                                  "update_count", "delete_count"]
         aggregate_logs.to_csv(f"{output_directory}/{actual_date.date()}.csv", index=False)
 
 
